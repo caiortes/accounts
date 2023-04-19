@@ -20,6 +20,7 @@ function operation() {
           "Consultar Saldo",
           "Depositar",
           "Sacar",
+          "Remover Conta",
           "Sair",
         ],
       },
@@ -35,6 +36,8 @@ function operation() {
         deposit();
       } else if (action === "Sacar") {
         withdraw();
+      } else if (action === "Remover Conta") {
+        remove();
       } else if (action === "Sair") {
         console.log(chalk.bgBlue.black("Obrigado por usar o Accounts!"));
         process.exit();
@@ -111,7 +114,7 @@ function deposit() {
           {
             name: "amount",
             message: "Quanto você deseja depositar?",
-          }
+          },
         ])
         .then((answser) => {
           const amount = answser["amount"];
@@ -192,7 +195,7 @@ function getAccountBalance() {
           `Olá, o saldo da sua conta é de R$${accountData.balance} reais!!`
         )
       );
-      operation()
+      operation();
     })
     .catch((err) => console.log(err));
 }
@@ -260,4 +263,32 @@ function removeAmount(accountName, amount) {
   console.log(
     chalk.green(`Foi realizado um saque de R$${amount} da sua conta!`)
   );
+}
+
+function remove() {
+  inquirer
+    .prompt([
+      {
+        name: "removeAccount",
+        message: "Qual conta deseja excluir?",
+      },
+    ])
+    .then((answser) => {
+      const accountName = answser["removeAccount"];
+
+      if (!checkAccount(accountName)) {
+        return remove();
+      }
+
+      removeAccount(accountName);
+    })
+    .catch((err) => console.log(err));
+}
+
+function removeAccount(accountName) {
+  const accountData = getAccount(accountName);
+
+  fs.unlink(`accounts/${accountName}.json`, (err) => console.log(err));
+
+  operation();
 }
